@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="es-AR">
-<head>
+<html lang="es-AR"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Propuesta Modular de Consultoría en Supply Chain y Logística</title>
@@ -12,6 +10,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Propuesta SCM">
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
     <style>
         :root {
             --primary-color: #1e3a8a;
@@ -393,6 +393,51 @@
                 display: none;
             }
         }
+        @media (max-width: 700px) {
+            body { padding: 16px 10px; }
+            .container { padding: 18px 14px; border-radius: 6px; }
+            h1 { font-size: 18pt; letter-spacing: 0.5px; }
+            h2 { font-size: 13pt; }
+            h3 { font-size: 12.5pt; }
+
+            .control-panel {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .control-panel .btn {
+                width: 100%;
+                margin: 4px 0;
+                text-align: center;
+            }
+
+            /* Las dos columnas (capa conceptual / operativa) se apilan en celular */
+            table, thead, tbody, th, td, tr { display: block; width: 100% !important; }
+            table { margin: 10px 0; }
+            th { border-bottom: none; }
+            td { border-top: none; }
+            tr:last-child td:last-child { border-bottom: 1px solid var(--border-color); }
+
+            .module-header { flex-wrap: wrap; }
+            .module-title { font-size: 11pt; }
+
+            .slider-section {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            .slider-container { margin-left: 0; margin-right: 0; }
+            .duration-value { text-align: center; }
+
+            .footer-sticky-bar {
+                flex-direction: column;
+                gap: 8px;
+                width: calc(100% - 20px);
+                padding: 12px 16px;
+                text-align: center;
+            }
+
+            .sync-note { font-size: 9.5pt; }
+        }
     </style>
 </head>
 <body>
@@ -400,9 +445,9 @@
 <div class="container">
     <header>
         <div class="editable-box" contenteditable="true">
-            <h1>Propuesta Modular de Consultoría</h1>
-            <h2>En Supply Chain y Logística</h2>
-            <p style="margin-top: 10px; font-style: italic; color: #6b7280;">Estructura de armado por eje estratégico — a medida del alcance contratado</p>
+            <h1>Propuesta Consultoría:</h1>
+            <h2>Supply Chain y Logística</h2>
+            <p style="margin-top: 10px; font-style: italic; color: #6b7280;">Estructura de armado por eje estratégico.</p>
         </div>
     </header>
 
@@ -410,11 +455,25 @@
         <strong>Nota operativa para el Consultor:</strong> Este documento es completamente interactivo. Puede hacer clic en cualquier bloque de texto para editarlo o personalizarlo según el cliente. Seleccione los módulos contratados mediante las casillas de verificación y ajuste la duración de cada uno utilizando los deslizadores (sliders). La barra inferior consolidará el tiempo total de forma automática. El resumen final se actualizará en tiempo real con las opciones seleccionadas. Use el botón "Descargar Archivo Personalizado" para exportar la propuesta comercial final.
     </div>
 
+    <div class="control-panel" style="margin-bottom:10px; flex-direction:column; align-items:stretch; gap:6px;">
+        <label for="proposal-code" style="font-size:10.5pt; font-weight:600; color:var(--primary-color);">
+            Código de esta propuesta (mismo código = mismo contenido en celular y notebook):
+        </label>
+        <input type="text" id="proposal-code" placeholder="ej: grido-cordoba-2026"
+            style="padding:10px 12px; border:1px solid var(--border-color); border-radius:4px; font-size:11pt;">
+        <div id="sync-status" style="font-size:10pt; font-style:italic; color:#6b7280;">
+            🟡 Nube no configurada todavía — guardando solo en este dispositivo.
+        </div>
+    </div>
+
     <div class="control-panel">
         <button class="btn btn-save" onclick="saveChanges()">Guardar Cambios</button>
         <button class="btn btn-download" onclick="downloadHTML()">Descargar Archivo Personalizado</button>
-        <button class="btn btn-undo" id="btn-undo" onclick="undoLastAction()" disabled>Volver Atrás (Undo)</button>
+        <button class="btn btn-undo" id="btn-undo" onclick="undoLastAction()" disabled="">Volver Atrás (Undo)</button>
     </div>
+    <p class="sync-note" style="margin-top:-10px; margin-bottom:25px; font-size:10.5pt; color:#6b7280; font-style:italic;">
+        Mirá el indicador de arriba: 🟢 significa que este código de propuesta ya está sincronizado en la nube (Firebase) y cualquier dispositivo que use el mismo código va a ver los mismos cambios, en tiempo real. 🟡 significa que la nube todavía no está configurada (ver README) y "Guardar Cambios" solo guarda un borrador en este dispositivo/navegador — para pasarlo a otro lado, hay que "Descargar Archivo Personalizado".
+    </p>
 
     <section class="section-break">
         <div class="editable-box" contenteditable="true">
@@ -467,10 +526,10 @@
         <div class="module-card" id="mod1">
             <div class="module-header">
                 <input type="checkbox" class="module-checkbox" id="chk-mod1" onchange="registerState(); updateTotalWeeks();">
-                <label for="chk-mod1" class="module-title" id="lbl-mod1">MÓDULO 1 · PLANIFICACIÓN DE LA DEMANDA Y OPERACIONES (S&OP)</label>
+                <label for="chk-mod1" class="module-title" id="lbl-mod1">MÓDULO 1 · PLANIFICACIÓN DE LA DEMANDA Y OPERACIONES (S&amp;OP)</label>
             </div>
             <table>
-                <tr>
+                <tbody><tr>
                     <th>CAPA CONCEPTUAL — Alta Dirección</th>
                     <th>CAPA OPERATIVA — Detalle Medio</th>
                 </tr>
@@ -478,7 +537,7 @@
                     <td><div class="editable-box" contenteditable="true">Alineación entre las proyecciones comerciales, la capacidad real de respuesta y el plan financiero. Prevención de capital inmovilizado y de quiebres de producto o servicio.</div></td>
                     <td><div class="editable-box" contenteditable="true">Diseño de modelos de pronóstico, evaluación de la variabilidad de la demanda y sincronización de los planes comerciales, de producción o de servicio en un solo proceso de revisión mensual.</div></td>
                 </tr>
-            </table>
+            </tbody></table>
             <div class="client-inputs editable-box" contenteditable="true" id="txt-mod1">
                 [Haga clic aquí para redactar el alcance específico y entregables adicionales para este cliente]
             </div>
@@ -497,7 +556,7 @@
                 <label for="chk-mod2" class="module-title" id="lbl-mod2">MÓDULO 2 · ABASTECIMIENTO Y FLUJO LOGÍSTICO INTEGRAL</label>
             </div>
             <table>
-                <tr>
+                <tbody><tr>
                     <th>CAPA CONCEPTUAL — Alta Dirección</th>
                     <th>CAPA OPERATIVA — Detalle Medio</th>
                 </tr>
@@ -505,7 +564,7 @@
                     <td><div class="editable-box" contenteditable="true">Estrategia de adquisiciones, rentabilidad del ciclo de compras y desarrollo de alianzas con proveedores estratégicos, incluyendo, cuando aplica, la coordinación de comercio exterior y logística internacional.</div></td>
                     <td><div class="editable-box" contenteditable="true">Políticas de reorden, diseño de ventanas logísticas de entrega, evaluación de proveedores alternativos y análisis de la eficiencia del proceso de compras.</div></td>
                 </tr>
-            </table>
+            </tbody></table>
             <div class="client-inputs editable-box" contenteditable="true" id="txt-mod2">
                 [Haga clic aquí para redactar el alcance específico y entregables adicionales para este cliente]
             </div>
@@ -524,7 +583,7 @@
                 <label for="chk-mod3" class="module-title" id="lbl-mod3">MÓDULO 3 · DISEÑO DE RED, CAPACIDAD E INFRAESTRUCTURA</label>
             </div>
             <table>
-                <tr>
+                <tbody><tr>
                     <th>CAPA CONCEPTUAL — Alta Dirección</th>
                     <th>CAPA OPERATIVA — Detalle Medio</th>
                 </tr>
@@ -532,7 +591,7 @@
                     <td><div class="editable-box" contenteditable="true">Definición de la huella logística óptima —cantidad y ubicación de depósitos, plantas o puntos de atención— y maximización del retorno sobre los activos físicos existentes.</div></td>
                     <td><div class="editable-box" contenteditable="true">Simulación de capacidad disponible, rediseño de distribución en planta (layout), zonificación por rotación y evaluación de alternativas de tercerización o infraestructura propia.</div></td>
                 </tr>
-            </table>
+            </tbody></table>
             <div class="client-inputs editable-box" contenteditable="true" id="txt-mod3">
                 [Haga clic aquí para redactar el alcance específico y entregables adicionales para este cliente]
             </div>
@@ -551,7 +610,7 @@
                 <label for="chk-mod4" class="module-title" id="lbl-mod4">MÓDULO 4 · GESTIÓN ESTRATÉGICA DE INVENTARIOS Y CAPITAL DE TRABAJO</label>
             </div>
             <table>
-                <tr>
+                <tbody><tr>
                     <th>CAPA CONCEPTUAL — Alta Dirección</th>
                     <th>CAPA OPERATIVA — Detalle Medio</th>
                 </tr>
@@ -559,7 +618,7 @@
                     <td><div class="editable-box" contenteditable="true">Liberación de capital de trabajo inmovilizado en stock sin comprometer la disponibilidad. Vínculo directo entre la política de inventarios y la salud financiera de la compañía.</div></td>
                     <td><div class="editable-box" contenteditable="true">Clasificación de materiales o insumos por importancia y variabilidad, definición de niveles de stock de seguridad y cálculo del costo de oportunidad del capital inmovilizado.</div></td>
                 </tr>
-            </table>
+            </tbody></table>
             <div class="client-inputs editable-box" contenteditable="true" id="txt-mod4">
                 [Haga clic aquí para redactar el alcance específico y entregables adicionales para este cliente]
             </div>
@@ -578,7 +637,7 @@
                 <label for="chk-mod5" class="module-title" id="lbl-mod5">MÓDULO 5 · DISTRIBUCIÓN Y NIVEL DE SERVICIO AL CLIENTE</label>
             </div>
             <table>
-                <tr>
+                <tbody><tr>
                     <th>CAPA CONCEPTUAL — Alta Dirección</th>
                     <th>CAPA OPERATIVA — Detalle Medio</th>
                 </tr>
@@ -586,7 +645,7 @@
                     <td><div class="editable-box" contenteditable="true">Aseguramiento de la promesa de entrega. Estrategia eficiente de última milla —o de atención al cliente, en el caso de servicios— y de logística inversa.</div></td>
                     <td><div class="editable-box" contenteditable="true">Mapeo de rutas o de recorridos de atención, gestión asertiva de devoluciones y reclamos, y monitoreo de los tiempos de tránsito o de espera.</div></td>
                 </tr>
-            </table>
+            </tbody></table>
             <div class="client-inputs editable-box" contenteditable="true" id="txt-mod5">
                 [Haga clic aquí para redactar el alcance específico y entregables adicionales para este cliente]
             </div>
@@ -605,7 +664,7 @@
                 <label for="chk-mod6" class="module-title" id="lbl-mod6">MÓDULO 6 · TRAZABILIDAD, MANTENIMIENTO Y PROCESOS OPERATIVOS</label>
             </div>
             <table>
-                <tr>
+                <tbody><tr>
                     <th>CAPA CONCEPTUAL — Alta Dirección</th>
                     <th>CAPA OPERATIVA — Detalle Medio</th>
                 </tr>
@@ -613,7 +672,7 @@
                     <td><div class="editable-box" contenteditable="true">Visibilidad transversal de los inventarios y del estado de los procesos. Mantenimiento del flujo continuo y eliminación de tareas sin valor agregado.</div></td>
                     <td><div class="editable-box" contenteditable="true">Tableros de control de stock cíclico, alertas de quiebre, mapeo de flujos de valor y sincronización entre áreas funcionales.</div></td>
                 </tr>
-            </table>
+            </tbody></table>
             <div class="client-inputs editable-box" contenteditable="true" id="txt-mod6">
                 [Haga clic aquí para redactar el alcance específico y entregables adicionales para este cliente]
             </div>
@@ -632,7 +691,7 @@
                 <label for="chk-mod7" class="module-title" id="lbl-mod7">MÓDULO 7 · GESTIÓN HUMANA Y PRODUCTIVIDAD DEL EQUIPO</label>
             </div>
             <table>
-                <tr>
+                <tbody><tr>
                     <th>CAPA CONCEPTUAL — Alta Dirección</th>
                     <th>CAPA OPERATIVA — Detalle Medio</th>
                 </tr>
@@ -640,7 +699,7 @@
                     <td><div class="editable-box" contenteditable="true">Alineación del capital humano con los estándares de eficiencia requeridos por la Dirección, cuidando la carga de trabajo real de las personas.</div></td>
                     <td><div class="editable-box" contenteditable="true">Definición de roles logísticos u operativos, evaluación de cargas de trabajo y diseño de rutinas operativas claras por posición.</div></td>
                 </tr>
-            </table>
+            </tbody></table>
             <div class="client-inputs editable-box" contenteditable="true" id="txt-mod7">
                 [Haga clic aquí para redactar el alcance específico y entregables adicionales para este cliente]
             </div>
@@ -659,7 +718,7 @@
                 <label for="chk-mod8" class="module-title" id="lbl-mod8">MÓDULO 8 · GESTIÓN DEL CAMBIO Y CULTURA DE MEJORA CONTINUA</label>
             </div>
             <table>
-                <tr>
+                <tbody><tr>
                     <th>CAPA CONCEPTUAL — Alta Dirección</th>
                     <th>CAPA OPERATIVA — Detalle Medio</th>
                 </tr>
@@ -667,7 +726,7 @@
                     <td><div class="editable-box" contenteditable="true">Aseguramiento de que las mejoras diseñadas se sostengan en el tiempo más allá del proyecto: la diferencia entre un rediseño en un documento y un rediseño que efectivamente se usa todos los días.</div></td>
                     <td><div class="editable-box" contenteditable="true">Rutinas de mejora incremental, capacitación en el nuevo modelo de trabajo y acompañamiento a los líderes de cada área durante la transición.</div></td>
                 </tr>
-            </table>
+            </tbody></table>
             <div class="client-inputs editable-box" contenteditable="true" id="txt-mod8">
                 [Haga clic aquí para redactar el alcance específico y entregables adicionales para este cliente]
             </div>
@@ -686,7 +745,7 @@
                 <label for="chk-mod9" class="module-title" id="lbl-mod9">MÓDULO 9 · GESTIÓN DE LA TECNOLOGÍA, DATOS Y FLUJO DE INFORMACIÓN</label>
             </div>
             <table>
-                <tr>
+                <tbody><tr>
                     <th>CAPA CONCEPTUAL — Alta Dirección</th>
                     <th>CAPA OPERATIVA — Detalle Medio</th>
                 </tr>
@@ -694,7 +753,7 @@
                     <td><div class="editable-box" contenteditable="true">Gobernanza de la información como activo estratégico para la visibilidad de punta a punta de la cadena.</div></td>
                     <td><div class="editable-box" contenteditable="true">Integración de los sistemas existentes (por ejemplo, de gestión de depósito o de relación con el cliente), automatización de alertas y planificación de la disponibilidad tecnológica futura.</div></td>
                 </tr>
-            </table>
+            </tbody></table>
             <div class="client-inputs editable-box" contenteditable="true" id="txt-mod9">
                 [Haga clic aquí para redactar el alcance específico y entregables adicionales para este cliente]
             </div>
@@ -713,7 +772,7 @@
                 <label for="chk-mod10" class="module-title" id="lbl-mod10">MÓDULO 10 · GESTIÓN INTEGRAL DE RIESGOS Y RESILIENCIA OPERATIVA</label>
             </div>
             <table>
-                <tr>
+                <tbody><tr>
                     <th>CAPA CONCEPTUAL — Alta Dirección</th>
                     <th>CAPA OPERATIVA — Detalle Medio</th>
                 </tr>
@@ -721,7 +780,7 @@
                     <td><div class="editable-box" contenteditable="true">Aseguramiento de la continuidad del negocio ante disrupciones externas —proveedores, mercado, clima— e internas —procesos, personas, tecnología.</div></td>
                     <td><div class="editable-box" contenteditable="true">Homologación de proveedores alternativos, protocolos de redundancia en infraestructura crítica y planes de contingencia documentados.</div></td>
                 </tr>
-            </table>
+            </tbody></table>
             <div class="client-inputs editable-box" contenteditable="true" id="txt-mod10">
                 [Haga clic aquí para redactar el alcance específico y entregables adicionales para este cliente]
             </div>
@@ -740,7 +799,7 @@
                 <label for="chk-mod11" class="module-title" id="lbl-mod11">MÓDULO 11 · SOSTENIBILIDAD Y ECONOMÍA CIRCULAR (ESG)</label>
             </div>
             <table>
-                <tr>
+                <tbody><tr>
                     <th>CAPA CONCEPTUAL — Alta Dirección</th>
                     <th>CAPA OPERATIVA — Detalle Medio</th>
                 </tr>
@@ -748,7 +807,7 @@
                     <td><div class="editable-box" contenteditable="true">Mitigación del impacto ambiental de la operación y cumplimiento de las normativas de sostenibilidad corporativa cada vez más exigidas por clientes e inversores.</div></td>
                     <td><div class="editable-box" contenteditable="true">Rediseño de la matriz de embalajes, reducción de la huella de carbono en el transporte y gestión responsable de residuos.</div></td>
                 </tr>
-            </table>
+            </tbody></table>
             <div class="client-inputs editable-box" contenteditable="true" id="txt-mod11">
                 [Haga clic aquí para redactar el alcance específico y entregables adicionales para este cliente]
             </div>
@@ -767,7 +826,7 @@
                 <label for="chk-mod12" class="module-title" id="lbl-mod12">MÓDULO 12 · GESTIÓN DE LA PRODUCCIÓN O SERVICIOS (TRANSFORMACIÓN)</label>
             </div>
             <table>
-                <tr>
+                <tbody><tr>
                     <th>CAPA CONCEPTUAL — Alta Dirección</th>
                     <th>CAPA OPERATIVA — Detalle Medio</th>
                 </tr>
@@ -775,7 +834,7 @@
                     <td><div class="editable-box" contenteditable="true">Optimización del proceso central de creación de valor, ya sea en manufactura física o en la prestación de servicios.</div></td>
                     <td><div class="editable-box" contenteditable="true">Control estadístico de mermas o reprocesos, y estandarización del tiempo de ciclo (lead time) en los puntos de contacto con el cliente.</div></td>
                 </tr>
-            </table>
+            </tbody></table>
             <div class="client-inputs editable-box" contenteditable="true" id="txt-mod12">
                 [Haga clic aquí para redactar el alcance específico y entregables adicionales para este cliente]
             </div>
@@ -817,9 +876,7 @@
     <section class="section-break">
         <h3>6. Resumen de Compromisos y Ejes Contratados</h3>
         <p>A continuación, se consolidan de manera automática los módulos validados por el cliente que formarán parte del acuerdo de servicios de consultoría:</p>
-        <div id="summary-container" class="summary-box">
-            <p style="font-style: italic; color: #6b7280;">No se ha seleccionado ningún módulo aún. Por favor, marque las opciones en la Sección 3.</p>
-        </div>
+        <div id="summary-container" class="summary-box"><p style="font-style: italic; color: #6b7280;">No se ha seleccionado ningún módulo aún. Por favor, marque las opciones en la Sección 3.</p></div>
     </section>
 
     <section class="section-break" style="margin-bottom: 120px;">
@@ -847,6 +904,129 @@
     let stateHistory = [];
     const maxHistory = 20;
 
+    // ============================================================
+    // CONFIGURACIÓN DE FIREBASE — PEGAR ACÁ TU CONFIG REAL
+    // Sacala de: Firebase Console → Configuración del proyecto →
+    // "Tus apps" → app Web → "SDK setup and configuration".
+    // Mientras diga "PEGAR_AQUI", la app funciona igual pero SOLO
+    // guarda en este dispositivo (no sincroniza con otros).
+    // ============================================================
+    const firebaseConfig = {
+        apiKey: "AIzaSyDHhDUJrRW5CB7dzjXnDQVHyBDdldDdny4",
+        authDomain: "propuestas-sc.firebaseapp.com",
+        projectId: "propuestas-sc",
+        storageBucket: "propuestas-sc.firebasestorage.app",
+        messagingSenderId: "641085407141",
+        appId: "1:641085407141:web:de3efd2ced7f9dc83cf24c"
+    };
+
+    let db = null;
+    let firebaseReady = false;
+    let unsubscribeDoc = null;
+    let applyingRemoteUpdate = false;
+    let pushTimer = null;
+
+    function firebaseConfigured() {
+        return firebaseConfig.apiKey && firebaseConfig.apiKey !== "PEGAR_AQUI";
+    }
+
+    function setSyncStatus(mode) {
+        const el = document.getElementById('sync-status');
+        if (!el) return;
+        if (mode === 'ok') {
+            el.textContent = "🟢 Sincronizado en la nube con el código: " + getProposalCode();
+            el.style.color = "#0d9488";
+        } else if (mode === 'connecting') {
+            el.textContent = "🔵 Conectando con la nube...";
+            el.style.color = "#3b82f6";
+        } else if (mode === 'error') {
+            el.textContent = "🔴 No se pudo conectar a la nube. Se sigue guardando solo en este dispositivo.";
+            el.style.color = "#dc2626";
+        } else {
+            el.textContent = "🟡 Nube no configurada todavía — guardando solo en este dispositivo.";
+            el.style.color = "#6b7280";
+        }
+    }
+
+    function sanitizeCode(raw) {
+        return (raw || '').trim().toLowerCase().replace(/[^a-z0-9\-_]/g, '-').slice(0, 80) || 'borrador-general';
+    }
+
+    function getProposalCode() {
+        const input = document.getElementById('proposal-code');
+        return sanitizeCode(input ? input.value : '');
+    }
+
+    function applyState(saved) {
+        if (!saved) return;
+        const editableEls = Array.from(document.querySelectorAll('[contenteditable="true"]'));
+        (saved.editable || []).forEach((html, i) => { if (editableEls[i]) editableEls[i].innerHTML = html; });
+
+        const checkboxEls = Array.from(document.querySelectorAll('input[type="checkbox"]'));
+        (saved.checkboxes || []).forEach((val, i) => { if (checkboxEls[i]) checkboxEls[i].checked = val; });
+
+        const rangeEls = Array.from(document.querySelectorAll('input[type="range"]'));
+        (saved.ranges || []).forEach((val, i) => { if (rangeEls[i]) rangeEls[i].value = val; });
+
+        for (let i = 1; i <= 12; i++) {
+            const slider = document.getElementById('range-mod' + i);
+            const display = document.getElementById('val-mod' + i);
+            if (slider && display) display.innerText = slider.value + " semanas";
+        }
+        updateTotalWeeks();
+    }
+
+    function initFirebase() {
+        if (!firebaseConfigured()) { setSyncStatus('idle'); return; }
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            firebaseReady = true;
+            subscribeToCloud(getProposalCode());
+        } catch (e) {
+            setSyncStatus('error');
+        }
+    }
+
+    function subscribeToCloud(code) {
+        if (!firebaseReady) return;
+        setSyncStatus('connecting');
+        if (unsubscribeDoc) { unsubscribeDoc(); unsubscribeDoc = null; }
+        unsubscribeDoc = db.collection('propuestas').doc(code).onSnapshot(
+            (doc) => {
+                if (doc.exists) {
+                    applyingRemoteUpdate = true;
+                    applyState(doc.data());
+                    applyingRemoteUpdate = false;
+                }
+                setSyncStatus('ok');
+            },
+            () => setSyncStatus('error')
+        );
+    }
+
+    function pushToCloud() {
+        if (!firebaseReady || applyingRemoteUpdate) return;
+        clearTimeout(pushTimer);
+        pushTimer = setTimeout(() => {
+            const code = getProposalCode();
+            db.collection('propuestas').doc(code).set({
+                ...captureFullState(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).catch(() => setSyncStatus('error'));
+        }, 700);
+    }
+
+    document.addEventListener('input', pushToCloud, true);
+    document.addEventListener('change', pushToCloud, true);
+
+    function onProposalCodeChanged() {
+        const code = getProposalCode();
+        try { localStorage.setItem('scm_last_proposal_code', code); } catch (e) {}
+        if (firebaseReady) subscribeToCloud(code);
+    }
+    // ============================================================
+
     function captureState() {
         let state = [];
         for (let i = 1; i <= 12; i++) {
@@ -860,6 +1040,38 @@
         }
         return JSON.stringify(state);
     }
+
+    // ---- Borrador local completo (texto editado + checkboxes + sliders) ----
+    // Alcance real: SOLO este dispositivo/navegador. No sincroniza con otros
+    // celulares ni con la notebook. Ver README para sincronización real.
+    const FULL_STATE_KEY = 'scm_proposal_full_state_v1';
+
+    function captureFullState() {
+        return {
+            editable: Array.from(document.querySelectorAll('[contenteditable="true"]')).map(el => el.innerHTML),
+            checkboxes: Array.from(document.querySelectorAll('input[type="checkbox"]')).map(el => el.checked),
+            ranges: Array.from(document.querySelectorAll('input[type="range"]')).map(el => el.value)
+        };
+    }
+
+    function persistFullState() {
+        try {
+            localStorage.setItem(FULL_STATE_KEY, JSON.stringify(captureFullState()));
+        } catch (e) { /* almacenamiento no disponible: se ignora silenciosamente */ }
+    }
+
+    function restoreFullState() {
+        let raw;
+        try { raw = localStorage.getItem(FULL_STATE_KEY); } catch (e) { return; }
+        if (!raw) return;
+        let saved;
+        try { saved = JSON.parse(raw); } catch (e) { return; }
+        applyState(saved);
+    }
+
+    // Autoguardado silencioso en ESTE dispositivo (no es sincronización remota)
+    document.addEventListener('input', persistFullState, true);
+    document.addEventListener('change', persistFullState, true);
 
     function registerState() {
         const currentState = captureState();
@@ -893,8 +1105,8 @@
     }
 
     function saveChanges() {
-        localStorage.setItem('scm_proposal_state', captureState());
-        alert("Cambios guardados con éxito en la sesión local de trabajo.");
+        persistFullState();
+        alert("Borrador guardado en ESTE dispositivo/navegador. No se sincroniza con la Web ni con otros celulares — para eso, usá 'Descargar Archivo Personalizado' y subilo al repositorio.");
     }
 
     function downloadHTML() {
@@ -983,8 +1195,19 @@
     }
 
     window.onload = function() {
+        let lastCode = '';
+        try { lastCode = localStorage.getItem('scm_last_proposal_code') || ''; } catch (e) {}
+        const codeInput = document.getElementById('proposal-code');
+        if (codeInput) {
+            codeInput.value = lastCode;
+            codeInput.addEventListener('change', onProposalCodeChanged);
+            codeInput.addEventListener('blur', onProposalCodeChanged);
+        }
+
+        restoreFullState();
         updateTotalWeeks();
         registerState();
+        initFirebase();
         
         for (let i = 1; i <= 12; i++) {
             const clientInput = document.getElementById('txt-mod' + i);
@@ -997,12 +1220,12 @@
     };
 </script>
 
-    <script>
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker.register("sw.js").catch(() => {});
-        });
-      }
-    </script>
-</body>
-</html>
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("sw.js").catch(() => {});
+    });
+  }
+</script>
+
+</body></html>

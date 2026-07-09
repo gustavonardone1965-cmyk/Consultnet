@@ -1,84 +1,141 @@
-# Propuesta Modular SCM — Cómo publicarla
+# Propuesta Modular SCM — Sincronización real con Firebase
 
-Esta carpeta contiene una PWA (Progressive Web App). Una vez publicada en un
-link https://, el cliente la abre desde el celular y le queda instalada como
-una app: ícono propio, pantalla completa, funciona offline.
+## Ya está todo el código listo. Solo falta UN paso tuyo: crear el proyecto
+## de Firebase y pegar 6 datos en el archivo. 5 a 10 minutos, gratis.
 
-Archivos incluidos:
-- `index.html` — la propuesta
-- `manifest.json` — nombre, ícono y modo de apertura de la app
-- `sw.js` — service worker (cachea todo para que funcione sin internet)
-- `icon-192.png` / `icon-512.png` — ícono de la app
-
-No modificar los nombres de estos archivos: `index.html` los referencia
-por nombre exacto.
+No inventé ninguna cuenta ni ninguna clave — eso solo lo podés crear vos
+(requiere aceptar los términos de Google con tu propia cuenta). Una vez
+que me pases —o pegues vos mismo— esos 6 datos, la sincronización en
+tiempo real entre celular y notebook queda funcionando de punta a punta.
 
 ---
 
-## Opción A — GitHub Pages (gratis y permanente)
+## Paso 1 — Crear el proyecto de Firebase
 
-**1. Crear la cuenta**
-Entrá a github.com → "Sign up" → completá email, usuario y contraseña.
+1. Entrá a **https://console.firebase.google.com** con tu cuenta de Google.
+2. "Agregar proyecto" → ponele un nombre, por ejemplo `propuesta-scm`.
+3. Podés desactivar Google Analytics en este proyecto (no hace falta).
+4. Esperá a que termine de crearse (unos 30 segundos).
 
-**2. Crear el repositorio**
-- Ícono "+" (arriba a la derecha) → "New repository"
-- Nombre, por ejemplo: `propuesta-scm`
-- Dejalo en **Public** (Pages gratis solo funciona con repos públicos)
-- No marcar "Add a README"
-- "Create repository"
+## Paso 2 — Activar Firestore
 
-**3. Subir los archivos**
-- En la página del repo, tocá "uploading an existing file"
-- Arrastrá los 5 archivos de esta carpeta **sueltos** (no el zip, no la carpeta)
-- Abajo, "Commit changes"
+1. En el menú de la izquierda: **Compilación → Firestore Database**.
+2. "Crear base de datos".
+3. Elegí **"Iniciar en modo de producción"**.
+4. Elegí la ubicación del servidor (cualquiera de Sudamérica, ej.
+   `southamerica-east1`, va a andar bien).
 
-**4. Activar Pages**
-- Pestaña **Settings** → menú izquierdo **Pages**
-- "Branch": elegir `main` y carpeta `/ (root)` → **Save**
-- Esperar 1-2 minutos
+## Paso 3 — Configurar las reglas de acceso de Firestore
 
-**5. Si aparece "Upgrade or make this repository public to enable Pages"**
-El repo quedó privado. Para arreglarlo:
-- **Settings** → bajar hasta la zona roja "Danger Zone"
-- "Change repository visibility" → "Change to public"
-- Escribir el nombre del repo para confirmar
-- Volver a **Settings → Pages** y activar como en el paso 4
+Dentro de Firestore Database → pestaña **"Reglas"**, reemplazar todo el
+contenido por esto y publicar:
 
-Tener en cuenta: un repo público significa que cualquiera con el link
-exacto puede ver el contenido. Sirve para la plantilla en blanco; si más
-adelante volcás ahí datos confidenciales de un cliente puntual, usar la
-Opción B en su lugar.
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /propuestas/{docId} {
+      allow read, write: if true;
+    }
+  }
+}
+```
 
-**6. Conseguir el link**
-Refrescar Settings → Pages. Aparece en verde:
-`Your site is live at https://tu-usuario.github.io/propuesta-scm/`
-Ese es el link para el cliente.
+**Importante — leer esto:** esta regla es intencionalmente abierta, porque
+la app no tiene un sistema de login. Cualquiera que sepa (o adivine) el
+"código de propuesta" exacto que le pongas a un cliente va a poder leerlo
+y editarlo. Por eso:
+- Usá códigos largos y no obvios (ej. `grido-cba-8f2k91`, no `cliente1`).
+- No pongas ahí información ultra sensible (montos finales de contrato,
+  datos personales) — es una propuesta comercial editable, no una caja
+  fuerte.
 
-**7. Actualizar contenido más adelante**
-"Add file" → "Upload files" en el repo, subir la versión nueva de
-`index.html` pisando la anterior. Se actualiza solo en un par de minutos.
+## Paso 4 — Registrar una app Web y copiar la configuración
+
+1. En la página principal del proyecto (ícono de engranaje → "Configuración
+   del proyecto"), bajar hasta "Tus apps".
+2. Tocar el ícono **</>** (Web).
+3. Ponerle un apodo (ej. "propuesta-web") y "Registrar app". **No hace
+   falta** activar Firebase Hosting.
+4. Firebase te muestra un bloque de código con un objeto `firebaseConfig`
+   parecido a esto:
+
+```js
+const firebaseConfig = {
+  apiKey: "AIzaSy...",
+  authDomain: "propuesta-scm.firebaseapp.com",
+  projectId: "propuesta-scm",
+  storageBucket: "propuesta-scm.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abcdef123456"
+};
+```
+
+## Paso 5 — Pegar esos datos en `index.html`
+
+Abrí `index.html` con cualquier editor de texto (o directo en GitHub, con
+el lápiz de "editar archivo") y buscá este bloque, cerca del final:
+
+```js
+const firebaseConfig = {
+    apiKey: "PEGAR_AQUI",
+    authDomain: "PEGAR_AQUI",
+    projectId: "PEGAR_AQUI",
+    storageBucket: "PEGAR_AQUI",
+    messagingSenderId: "PEGAR_AQUI",
+    appId: "PEGAR_AQUI"
+};
+```
+
+Reemplazá cada `"PEGAR_AQUI"` por el valor real que te dio Firebase en el
+Paso 4. Guardar, subir a GitHub pisando el `index.html` anterior.
+
+Si preferís, pegame acá los 6 valores y yo te devuelvo el archivo ya
+completado — como quieras.
 
 ---
 
-## Opción B — Netlify Drop (gratis, sin cuenta, y podés mantenerlo no listado)
+## Cómo se usa, una vez configurado
 
-1. Entrar a **netlify.com/drop**
-2. Arrastrar esta carpeta completa (`app`) al navegador
-3. En segundos entrega una URL tipo `https://nombre-random.netlify.app`
-4. Ese es el link para el cliente
-
-Ventaja frente a GitHub Pages: no requiere que el código sea público en
-ningún repositorio, y no hace falta cuenta para el primer despliegue.
-Si querés poder actualizar el mismo sitio después (en vez de generar uno
-nuevo cada vez), conviene crear una cuenta gratuita en Netlify antes de
-arrastrar la carpeta.
+- Arriba de los botones hay un campo **"Código de esta propuesta"**.
+  Ese código es la clave: si abrís el sitio en el celular y en la
+  notebook con el **mismo código**, van a ver y editar exactamente el
+  mismo contenido, en tiempo real (con conexión a internet).
+- El indicador de estado te dice en qué modo está:
+  - 🟢 Sincronizado en la nube — cambios visibles en todos los dispositivos
+    que usen el mismo código.
+  - 🟡 Nube no configurada — solo se guarda en este dispositivo (pasa esto
+    hasta que completes los Pasos 1 a 5).
+  - 🔴 Error de conexión — revisar las reglas de Firestore (Paso 3) o la
+    conexión a internet.
+- Si estás sin señal, la app sigue funcionando y guardando localmente;
+  apenas vuelva la conexión, sincroniza sola.
+- El botón **"Descargar Archivo Personalizado"** sigue estando disponible
+  para cuando quieras un archivo `.html` final y cerrado para mandarle al
+  cliente por mail, sin depender de que abra ningún link en vivo.
 
 ---
 
-## Instalar la app en el celular (una vez publicada)
+## Qué se corrigió en esta versión (resumen de cambios previos)
 
-1. Abrir el link publicado desde **Chrome en Android**
-2. Va a aparecer un aviso "Instalar app" (o desde el menú ⋮ → "Instalar
-   aplicación" / "Añadir a pantalla de inicio")
-3. Confirmar. Queda el ícono en la pantalla de inicio del celular, se abre
-   a pantalla completa y funciona sin conexión.
+1. **Responsive real**: el archivo original solo tenía estilos para
+   impresión. Se agregó una media query para celular que apila las tablas,
+   botones y sliders en una sola columna.
+2. **PWA**: manifest + ícono + service worker, para poder "instalar" el
+   sitio en el celular como si fuera una app.
+3. **Service worker corregido**: ahora prioriza siempre la versión más
+   nueva del sitio (network-first) en vez de quedarse con una copia vieja
+   en caché.
+4. **No se perdió contenido**: se verificó línea por línea contra tu
+   archivo original — nada de tu texto fue borrado o modificado, solo se
+   agregaron estas capas nuevas.
+
+---
+
+## Publicación
+
+Repo: https://github.com/gustavonardone1965-cmyk/Consultnet/
+Sitio: https://gustavonardone1965-cmyk.github.io/Consultnet/
+
+Subir los 5 archivos (`index.html`, `manifest.json`, `sw.js`,
+`icon-192.png`, `icon-512.png`) pisando los existentes.
