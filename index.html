@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propuesta Modular de Consultoría en Supply Chain y Logística</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e3a8a">
+    <link rel="icon" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Propuesta SCM">
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #3b82f6;
+            --text-color: #1f2937;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --accent-color: #0d9488;
+            --danger-color: #dc2626;
+            --download-color: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        header {
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 24pt;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            font-size: 18pt;
+            color: var(--secondary-color);
+            margin-top: 5px;
+            font-weight: 400;
+        }
+
+        h3 {
+            font-size: 14pt;
+            color: var(--primary-color);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--secondary-color);
+            padding-left: 10px;
+        }
+
+        p, ul, ol {
+            margin-bottom: 15px;
+            font-size: 11pt;
+            text-align: justify;
+        }
+
+        ul, ol {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .editable-box {
+            border: 1px dashed transparent;
+            transition: all 0.3s ease;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .editable-box:hover {
+            border-color: var(--secondary-color);
+            background-color: #fbfbfe;
+            cursor: pointer;
+        }
+
+        .editable-box:focus {
+            border-color: var(--primary-color);
+            background-color: #fff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .instruction-note {
+            background-color: #eff6ff;
+            border-left: 4px solid var(--secondary-color);
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 0 4px 4px 0;
+            font-size: 10pt;
+        }
+
+        .control-panel {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 10pt;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .btn-save {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-save:hover {
+            background-color: #0b7a70;
+        }
+
+        .btn-download {
+            background-color: var(--download-color);
+            color: white;
+        }
+
+        .btn-download:hover {
+            background-color: #059669;
+        }
+
+        .btn-undo {
+            background-color: #4b5563;
+            color: white;
+        }
+
+        .btn-undo:hover {
+            background-color: #374151;
+        }
+
+        .btn-undo:disabled {
+            background-color: #d1d5db;
+            cursor: not-allowed;
+        }
+
+        .module-card {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 25px;
+            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+
+        .module-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            border-color: #cbd5e1;
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            background-color: #f8fafc;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .module-checkbox {
+            width: 18px;
+            height: 18px;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+
+        .module-title {
+            font-size: 12pt;
+            font-weight: bold;
+            color: var(--primary-color);
+            flex-grow: 1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 10.5pt;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            vertical-align: top;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: var(--primary-color);
+            font-weight: 600;
+            width: 50%;
+        }
+
+        .client-inputs {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #fdfdfd;
+            border: 1px dashed #cbd5e1;
+            border-radius: 4px;
+            font-style: italic;
+            color: #4b5563;
+        }
+
+        .slider-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f8fafc;
+            padding: 10px 15px;
+            border-radius: 4px;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+            margin-left: 20px;
+            margin-right: 20px;
+        }
+
+        .slider-container input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+            -webkit-appearance: none;
+        }
+
+        .slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            cursor: pointer;
+            transition: background 0.15s ease-in-out;
+        }
+
+        .slider-container input[type="range"]::-webkit-slider-thumb:hover {
+            background: var(--primary-color);
+        }
+
+        .duration-label {
+            font-size: 10pt;
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        .duration-value {
+            font-size: 11pt;
+            font-weight: bold;
+            color: var(--accent-color);
+            min-width: 90px;
+            text-align: right;
+        }
+
+        .summary-box {
+            background-color: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .summary-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .summary-item-title {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .footer-sticky-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 40px);
+            max-width: 1000px;
+            background-color: var(--primary-color);
+            color: #ffffff;
+            padding: 15px 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+
+        .total-title {
+            font-size: 13pt;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .total-value-box {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 15pt;
+            font-weight: bold;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .section-break {
+            margin-bottom: 40px;
+        }
+
+        @media print {
+            body {
+                background-color: #fff;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 0;
+                max-width: 100%;
+            }
+            .control-panel, .instruction-note {
+                display: none !important;
+            }
+            .footer-sticky-bar {
+                position: static;
+                transform: none;
+                width: 100%;
+                margin-top: 40px;
+                background-color: #f1f5f9;
+                color: #000;
+                border: 1px solid #cbd5e1;
+                box-shadow: none;
+            }
+            .total-value-box {
+                color: #000;
+                background: none;
+                border: none;
+            }
+            .editable-box {
+                border: none;
+            }
+            input[type="range"] {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="editable-box" contenteditable="true">
+            <h1>Propuesta Modular de Consultoría</h1>
+            <h2>En Supply Chain y Logística</h2>
+            <p style="margin-top: 10px; font-style: italic; color: #6b7280;">Estructura de armado por eje estratégico — a medida del alcance contratado</p>
+        </div>
+    </header>
+
+    <div class="instruction-note">
+        <strong>Nota operativa para el Consultor:</strong> Este documento es completamente interactivo. Puede hacer clic en cualquier bloque de texto para editarlo o personalizarlo según el cliente. Seleccione los módulos contratados mediante las casillas de verificación y ajuste la duración de cada uno utilizando los deslizadores (sliders). La barra inferior consolidará el tiempo total de forma automática. El resumen final se actualizará en tiempo real con las opciones seleccionadas. Use el botón "Descargar Archivo Personalizado" para exportar la propuesta comercial final.
+    </div>
+
+    <div class="control-panel">
+        <button class="btn btn-save" onclick="saveChanges()">Guardar Cambios</button>
+        <button class="btn btn-download" onclick="downloadHTML()">Descargar Archivo Personalizado</button>
+        <button class="btn btn-undo" id="btn-undo" onclick="undoLastAction()" disabled>Volver Atrás (Undo)</button>
+    </div>
+
+    <section class="section-break">
+        <div class="editable-box" contenteditable="true">
+            <h3>0. Cómo usar esta plantilla</h3>
+            <p>Este documento es un menú de trabajo, no una propuesta cerrada. Contiene los bloques fijos que aplican a cualquier alcance (resumen ejecutivo, enfoque metodológico y razones del enfoque) y un menú de doce módulos independientes — uno por cada eje estratégico — que se seleccionan según lo que el cliente decida contratar.</p>
+            <ul>
+                <li>Marcar con una tilde el/los módulo(s) que forman parte del alcance acordado con el cliente.</li>
+                <li>Completar el espacio en blanco de cada módulo seleccionado con el alcance específico, hallazgos preliminares o entregables adicionales de ese cliente en particular.</li>
+                <li>Eliminar del documento final los módulos no contratados; conservarlos aquí solo como referencia de venta cruzada futura.</li>
+                <li>Ajustar el Plan de Trabajo y la Propuesta Económica en función de la cantidad de módulos y de la complejidad específica de cada uno.</li>
+                <li>Los bloques fijos (Secciones 1, 2 y 5) no deberían necesitar reescritura entre propuestas: están redactados para sostenerse sin importar cuántos ni cuáles módulos se contraten. La única sección que cambia de fondo con el alcance es la Matriz de Ejes (Sección 3).</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="section-break">
+        <div class="editable-box" contenteditable="true">
+            <h3>1. Resumen Ejecutivo</h3>
+            <p>La presente propuesta tiene como objetivo transformar la cadena de abastecimiento y los procesos operativos de <strong>[NOMBRE DEL CLIENTE]</strong> en los ejes acordados, para asegurar su crecimiento sostenido y su rentabilidad.</p>
+            <p>A través de un diagnóstico analítico y centrado en el negocio, se identifican las restricciones críticas del flujo actual dentro del alcance contratado y se diseña un plan de acción concreto y priorizado. El modelo entiende la cadena como un sistema único de punta a punta. Por ello, aun cuando el alcance contratado no incluya la totalidad de los doce ejes, cada módulo seleccionado se analiza también en función de cómo impacta a los procesos adyacentes que quedan fuera del alcance, para que ninguna mejora local genere un problema nuevo en otro eslabón.</p>
+            <p><strong>Pilares del enfoque a medida:</strong></p>
+            <ul>
+                <li><strong>Enfoque a medida:</strong> solo se desarrollan en profundidad los ejes estratégicos que el cliente decide contratar.</li>
+                <li><strong>Optimización de recursos:</strong> máxima eficiencia en el uso de los activos e infraestructura existentes dentro del alcance definido.</li>
+                <li><strong>Visión multinivel:</strong> cada eje contratado se presenta en capa conceptual (Dirección) y capa operativa (equipo de ejecución).</li>
+                <li><strong>Capital de trabajo y rentabilidad:</strong> toda recomendación se evalúa también por su impacto financiero, no solo operativo.</li>
+                <li><strong>Sostenibilidad del resultado:</strong> el objetivo final no es un informe, sino un equipo interno capaz de sostener el modelo con o sin acompañamiento externo.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="section-break">
+        <div class="editable-box" contenteditable="true">
+            <h3>2. Enfoque Metodológico</h3>
+            <p>Estos principios ordenan el trabajo en cualquier combinación de módulos contratados — son los que garantizan que el diagnóstico sea útil para decidir, y no solo para describir:</p>
+            <ul>
+                <li><strong>Basado en datos y en el flujo real:</strong> las recomendaciones se apoyan en la evidencia del movimiento real de materiales, información y personas, no en supuestos ni en percepciones.</li>
+                <li><strong>Mirada de punta a punta:</strong> cada eje contratado se analiza también en su relación con los procesos adyacentes, estén o no dentro del alcance. Una mejora que optimiza un eslabón a costa de otro no se considera una mejora real.</li>
+                <li><strong>Doble capa de lectura:</strong> cada eje estratégico contratado se presenta en dos niveles — uno conceptual, para la toma de decisiones de Dirección, y uno operativo, con el detalle necesario para que el equipo ejecute sin ambigüedad.</li>
+                <li><strong>Adaptable a lo físico y a lo intangible:</strong> el mismo marco de trabajo aplica tanto a una cadena de manufactura como a la cadena de valor de una empresa de servicios, ajustando vocabulario y métricas a cada reality.</li>
+                <li><strong>Foco en la continuidad del resultado:</strong> la meta no es entregar un documento, sino dejar instalada la capacidad y la rutina necesarias para que las mejoras se sostengan en el tiempo.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="section-break">
+        <h3>3. Menú de Ejes Estratégicos (Módulos)</h3>
+        <p style="margin-bottom: 20px; color: #4b5563;">Doce módulos independientes, cada uno auditable de forma aislada o combinada con los demás. Cada módulo conserva su doble capa de lectura y su propio espacio parametrizable de tiempo.</p>
+
+        <div class="module-card" id="mod1">
+            <div class="module-header">
+                <input type="checkbox" class="module-checkbox" id="chk-mod1" onchange="registerState(); updateTotalWeeks();">
+                <label for="chk-mod1" class="module-title" id="lbl-mod1">MÓDULO 1 · PLANIFICACIÓN DE LA DEMANDA Y OPERACIONES (S&OP)</label>
+            </div>
+            <table>
+                <tr>
+                    <th>CAPA CONCEPTUAL — Alta Dirección</th>
+                    <th>CAPA OPERATIVA — Detalle Medio</th>
+                </tr>
+                <tr>
+                    <td><div class="editable-box" contenteditable="true">Alineación entre las proyecciones comerciales, la capacidad real de respuesta y el plan financiero. Prevención de capital inmovilizado y de quiebres de producto o servicio.</div></td>
+                    <td><div class="editable-box" contenteditable="true">Diseño de modelos de pronóstico, evaluación de la variabilidad de la demanda y sincronización de los planes comerciales, de producción o de servicio en un solo proceso de revisión mensual.</div></td>
+                </tr>
+            </table>
+            <div class="client-inputs editable-box" contenteditable="true" id="txt-mod1">
+                [Haga clic aquí para redactar el alcance específico y entregables adicionales para este cliente]
+            </div>
+            <div class="slider-section">
+                <span class="duration-label">Plazo estimado para este módulo:</span>
+                <div class="slider-container">
+                    <input type="range" min="0" max="52" value="4" id="range-mod1" oninput="syncSliderValue(1)" onchange="registerState()">
+                </div>
+                <span class="duration-value" id="val-mod1">4 semanas</span>
+            </div>
+        </div>
+
+        <div class="module-card" id="mod2">
+            <div class="module-header">
+                <input type="checkbox" class="module-checkbox" id="chk-mod2" onchange="registerState(); updateTotalWeeks();">
+                <label for="chk-mod2" class="module-title" id="lbl-mod2">MÓDULO 2 · ABASTECIMIENTO Y FLUJO LOGÍSTICO INTEGRAL</label>
+            </div>
+            <table>
+                <tr>
+                    <th>CAPA CONCEPTUAL — Alta Dirección</th>
+                    <th>CAPA OPERATIVA — Detalle Medio</th>
+                </tr>
+                <tr>
+                    <td><div class="editable-box" contenteditable="true">Estrategia de adquisiciones, rentabilidad del ciclo de compras y desarrollo de alianzas con proveedores estratégicos, incluyendo, cuando aplica, la coordinación de comercio exterior y logística internacional.</div></td>
+                    <td><div class="editable-box" contenteditable="true">Políticas de reorden, diseño de ventanas logísticas de entrega, evaluación de proveedores alternativos y análisis de la eficiencia del proceso de compras.</div></td>
+                </tr>
+            </table>
+            <div class="client-inputs editable-box" contenteditable="true" id="txt-mod2">
+                [Haga clic aquí para redactar el alcance específico y entregables adicionales para este cliente]
+            </div>
+            <div class="slider-section">
+                <span class="duration-label">Plazo estimado para este módulo:</span>
+                <div class="slider-container">
+                    <input type="range" min="0" max="52" value="3" id="range-mod2" oninput="syncSliderValue(2)" onchange="registerState()">
+                </div>
+                <span class="duration-value" id="val-mod2">3 semanas</span>
+            </div>
+        </div>
+
+        <div class="module-card" id="mod3">
+            <div class="module-header">
+                <input type="checkbox" class="module-checkbox" id="chk-mod3" onchange="registerState(); updateTotalWeeks();">
+                <label for="chk-mod3" class="module-title" id="lbl-mod3">MÓDULO 3 · DISEÑO DE RED, CAPACIDAD E INFRAESTRUCTURA</label>
+            </div>
+            <table>
+                <tr>
+                    <th>CAPA CONCEPTUAL — Alta Dirección</th>
+                    <th>CAPA OPERATIVA — Detalle Medio</th>
+                </tr>
+                <tr>
+                    <td><div class="editable-box" contenteditable="true">Definición de la huella logística óptima —cantidad y ubicación de depósitos, plantas o puntos de atención— y maximización del retorno sobre los activos físicos existentes.</div></td>
+                    <td><div class="editable-box" contenteditable="true">Simulación de capacidad disponible, rediseño de distribución en planta (layout), zonificación por rotación y evaluación de alternativas de tercerización o infraestructura propia.</div></td>
+                </tr>
+            </table>
+            <div class="client-inputs editable-box" contenteditable="true" id="txt-mod3">
+                [Haga clic aquí para redactar el alcance específico y entregables adicionales para este cliente]
+            </div>
+            <div class="slider-section">
+                <span class="duration-label">Plazo estimado para este módulo:</span>
+                <div class="slider-container">
+                    <input type="range" min="0" max="52" value="5" id="range-mod3" oninput="syncSliderValue(3)" onchange="registerState()">
+                </div>
+                <span class="duration-value" id="val-mod3">5 semanas</span>
+            </div>
+        </div>
+
+        <div class="module-card" id="mod4">
+            <div class="module-header">
+                <input type="checkbox" class="module-checkbox" id="chk-mod4" onchange="registerState(); updateTotalWeeks();">
+                <label for="chk-mod4" class="module-title" id="lbl-mod4">MÓDULO 4 · GESTIÓN ESTRATÉGICA DE INVENTARIOS Y CAPITAL DE TRABAJO</label>
+            </div>
+            <table>
+                <tr>
+                    <th>CAPA CONCEPTUAL — Alta Dirección</th>
+                    <th>CAPA OPERATIVA — Detalle Medio</th>
+                </tr>
+                <tr>
+                    <td><div class="editable-box" contenteditable="true">Liberación de capital de trabajo inmovilizado en stock sin comprometer la disponibilidad. Vínculo directo entre la política de inventarios y la salud financiera de la compañía.</div></td>
+                    <td><div class="editable-box" contenteditable="true">Clasificación de materiales o insumos por importancia y variabilidad, definición de niveles de stock de seguridad y cálculo del costo de oportunidad del capital inmovilizado.</div></td>
+                </tr>
+            </table>
+            <div class="client-inputs editable-box" contenteditable="true" id="txt-mod4">
+                [Haga clic aquí para redactar el alcance específico y entregables adicionales para este cliente]
+            </div>
+            <div class="slider-section">
+                <span class="duration-label">Plazo estimado para este módulo:</span>
+                <div class="slider-container">
+                    <input type="range" min="0" max="52" value="4" id="range-mod4" oninput="syncSliderValue(4)" onchange="registerState()">
+                </div>
+                <span class="duration-value" id="val-mod4">4 semanas</span>
+            </div>
+        </div>
+
+        <div class="module-card" id="mod5">
+            <div class="module-header">
+                <input type="checkbox" class="module-checkbox" id="chk-mod5" onchange="registerState(); updateTotalWeeks();">
+                <label for="chk-mod5" class="module-title" id="lbl-mod5">MÓDULO 5 · DISTRIBUCIÓN Y NIVEL DE SERVICIO AL CLIENTE</label>
+            </div>
+            <table>
+                <tr>
+                    <th>CAPA CONCEPTUAL — Alta Dirección</th>
+                    <th>CAPA OPERATIVA — Detalle Medio</th>
+                </tr>
+                <tr>
+                    <td><div class="editable-box" contenteditable="true">Aseguramiento de la promesa de entrega. Estrategia eficiente de última milla —o de atención al cliente, en el caso de servicios— y de logística inversa.</div></td>
+                    <td><div class="editable-box" contenteditable="true">Mapeo de rutas o de recorridos de atención, gestión asertiva de devoluciones y reclamos, y monitoreo de los tiempos de tránsito o de espera.</div></td>
+                </tr>
+            </table>
+            <div class="client-inputs editable-box" contenteditable="true" id="txt-mod5">
+                [Haga clic aquí para redactar el alcance específico y entregables adicionales para este cliente]
+            </div>
+            <div class="slider-section">
+                <span class="duration-label">Plazo estimado para este módulo:</span>
+                <div class="slider-container">
+                    <input type="range" min="0" max="52" value="3" id="range-mod5" oninput="syncSliderValue(5)" onchange="registerState()">
+                </div>
+                <span class="duration-value" id="val-mod5">3 semanas</span>
+            </div>
+        </div>
+
+        <div class="module-card" id="mod6">
+            <div class="module-header">
+                <input type="checkbox" class="module-checkbox" id="chk-mod6" onchange="registerState(); updateTotalWeeks();">
+                <label for="chk-mod6" class="module-title" id="lbl-mod6">MÓDULO 6 · TRAZABILIDAD, MANTENIMIENTO Y PROCESOS OPERATIVOS</label>
+            </div>
+            <table>
+                <tr>
+                    <th>CAPA CONCEPTUAL — Alta Dirección</th>
+                    <th>CAPA OPERATIVA — Detalle Medio</th>
+                </tr>
+                <tr>
+                    <td><div class="editable-box" contenteditable="true">Visibilidad transversal de los inventarios y del estado de los procesos. Mantenimiento del flujo continuo y eliminación de tareas sin valor agregado.</div></td>
+                    <td><div class="editable-box" contenteditable="true">Tableros de control de stock cíclico, alertas de quiebre, mapeo de flujos de valor y sincronización entre áreas funcionales.</div></td>
+                </tr>
+            </table>
+            <div class="client-inputs editable-box" contenteditable="true" id="txt-mod6">
+                [Haga clic aquí para redactar el alcance específico y entregables adicionales para este cliente]
+            </div>
+            <div class="slider-section">
+                <span class="duration-label">Plazo estimado para este módulo:</span>
+                <div class="slider-container">
+                    <input type="range" min="0" max="52" value="4" id="range-mod6" oninput="syncSliderValue(6)" onchange="registerState()">
+                </div>
+                <span class="duration-value" id="val-mod6">4 semanas</span>
+            </div>
+        </div>
+
+        <div class="module-card" id="mod7">
+            <div class="module-header">
+                <input type="checkbox" class="module-checkbox" id="chk-mod7" onchange="registerState(); updateTotalWeeks();">
+                <label for="chk-mod7" class="module-title" id="lbl-mod7">MÓDULO 7 · GESTIÓN HUMANA Y PRODUCTIVIDAD DEL EQUIPO</label>
+            </div>
+            <table>
+                <tr>
+                    <th>CAPA CONCEPTUAL — Alta Dirección</th>
+                    <th>CAPA OPERATIVA — Detalle Medio</th>
+                </tr>
+                <tr>
+                    <td><div class="editable-box" contenteditable="true">Alineación del capital humano con los estándares de eficiencia requeridos por la Dirección, cuidando la carga de trabajo real de las personas.</div></td>
+                    <td><div class="editable-box" contenteditable="true">Definición de roles logísticos u operativos, evaluación de cargas de trabajo y diseño de rutinas operativas claras por posición.</div></td>
+                </tr>
+            </table>
+            <div class="client-inputs editable-box" contenteditable="true" id="txt-mod7">
+                [Haga clic aquí para redactar el alcance específico y entregables adicionales para este cliente]
+            </div>
+            <div class="slider-section">
+                <span class="duration-label">Plazo estimado para este módulo:</span>
+                <div class="slider-container">
+                    <input type="range" min="0" max="52" value="3" id="range-mod7" oninput="syncSliderValue(7)" onchange="registerState()">
+                </div>
+                <span class="duration-value" id="val-mod7">3 semanas</span>
+            </div>
+        </div>
+
+        <div class="module-card" id="mod8">
+            <div class="module-header">
+                <input type="checkbox" class="module-checkbox" id="chk-mod8" onchange="registerState(); updateTotalWeeks();">
+                <label for="chk-mod8" class="module-title" id="lbl-mod8">MÓDULO 8 · GESTIÓN DEL CAMBIO Y CULTURA DE MEJORA CONTINUA</label>
+            </div>
+            <table>
+                <tr>
+                    <th>CAPA CONCEPTUAL — Alta Dirección</th>
+                    <th>CAPA OPERATIVA — Detalle Medio</th>
+                </tr>
+                <tr>
+                    <td><div class="editable-box" contenteditable="true">Aseguramiento de que las mejoras diseñadas se sostengan en el tiempo más allá del proyecto: la diferencia entre un rediseño en un documento y un rediseño que efectivamente se usa todos los días.</div></td>
+                    <td><div class="editable-box" contenteditable="true">Rutinas de mejora incremental, capacitación en el nuevo modelo de trabajo y acompañamiento a los líderes de cada área durante la transición.</div></td>
+                </tr>
+            </table>
+            <div class="client-inputs editable-box" contenteditable="true" id="txt-mod8">
+                [Haga clic aquí para redactar el alcance específico y entregables adicionales para este cliente]
+            </div>
+            <div class="slider-section">
+                <span class="duration-label">Plazo estimado para este módulo:</span>
+                <div class="slider-container">
+                    <input type="range" min="0" max="52" value="4" id="range-mod8" oninput="syncSliderValue(8)" onchange="registerState()">
+                </div>
+                <span class="duration-value" id="val-mod8">4 semanas</span>
+            </div>
+        </div>
+
+        <div class="module-card" id="mod9">
+            <div class="module-header">
+                <input type="checkbox" class="module-checkbox" id="chk-mod9" onchange="registerState(); updateTotalWeeks();">
+                <label for="chk-mod9" class="module-title" id="lbl-mod9">MÓDULO 9 · GESTIÓN DE LA TECNOLOGÍA, DATOS Y FLUJO DE INFORMACIÓN</label>
+            </div>
+            <table>
+                <tr>
+                    <th>CAPA CONCEPTUAL — Alta Dirección</th>
+                    <th>CAPA OPERATIVA — Detalle Medio</th>
+                </tr>
+                <tr>
+                    <td><div class="editable-box" contenteditable="true">Gobernanza de la información como activo estratégico para la visibilidad de punta a punta de la cadena.</div></td>
+                    <td><div class="editable-box" contenteditable="true">Integración de los sistemas existentes (por ejemplo, de gestión de depósito o de relación con el cliente), automatización de alertas y planificación de la disponibilidad tecnológica futura.</div></td>
+                </tr>
+            </table>
+            <div class="client-inputs editable-box" contenteditable="true" id="txt-mod9">
+                [Haga clic aquí para redactar el alcance específico y entregables adicionales para este cliente]
+            </div>
+            <div class="slider-section">
+                <span class="duration-label">Plazo estimado para este módulo:</span>
+                <div class="slider-container">
+                    <input type="range" min="0" max="52" value="3" id="range-mod9" oninput="syncSliderValue(9)" onchange="registerState()">
+                </div>
+                <span class="duration-value" id="val-mod9">3 semanas</span>
+            </div>
+        </div>
+
+        <div class="module-card" id="mod10">
+            <div class="module-header">
+                <input type="checkbox" class="module-checkbox" id="chk-mod10" onchange="registerState(); updateTotalWeeks();">
+                <label for="chk-mod10" class="module-title" id="lbl-mod10">MÓDULO 10 · GESTIÓN INTEGRAL DE RIESGOS Y RESILIENCIA OPERATIVA</label>
+            </div>
+            <table>
+                <tr>
+                    <th>CAPA CONCEPTUAL — Alta Dirección</th>
+                    <th>CAPA OPERATIVA — Detalle Medio</th>
+                </tr>
+                <tr>
+                    <td><div class="editable-box" contenteditable="true">Aseguramiento de la continuidad del negocio ante disrupciones externas —proveedores, mercado, clima— e internas —procesos, personas, tecnología.</div></td>
+                    <td><div class="editable-box" contenteditable="true">Homologación de proveedores alternativos, protocolos de redundancia en infraestructura crítica y planes de contingencia documentados.</div></td>
+                </tr>
+            </table>
+            <div class="client-inputs editable-box" contenteditable="true" id="txt-mod10">
+                [Haga clic aquí para redactar el alcance específico y entregables adicionales para este cliente]
+            </div>
+            <div class="slider-section">
+                <span class="duration-label">Plazo estimado para este módulo:</span>
+                <div class="slider-container">
+                    <input type="range" min="0" max="52" value="4" id="range-mod10" oninput="syncSliderValue(10)" onchange="registerState()">
+                </div>
+                <span class="duration-value" id="val-mod10">4 semanas</span>
+            </div>
+        </div>
+
+        <div class="module-card" id="mod11">
+            <div class="module-header">
+                <input type="checkbox" class="module-checkbox" id="chk-mod11" onchange="registerState(); updateTotalWeeks();">
+                <label for="chk-mod11" class="module-title" id="lbl-mod11">MÓDULO 11 · SOSTENIBILIDAD Y ECONOMÍA CIRCULAR (ESG)</label>
+            </div>
+            <table>
+                <tr>
+                    <th>CAPA CONCEPTUAL — Alta Dirección</th>
+                    <th>CAPA OPERATIVA — Detalle Medio</th>
+                </tr>
+                <tr>
+                    <td><div class="editable-box" contenteditable="true">Mitigación del impacto ambiental de la operación y cumplimiento de las normativas de sostenibilidad corporativa cada vez más exigidas por clientes e inversores.</div></td>
+                    <td><div class="editable-box" contenteditable="true">Rediseño de la matriz de embalajes, reducción de la huella de carbono en el transporte y gestión responsable de residuos.</div></td>
+                </tr>
+            </table>
+            <div class="client-inputs editable-box" contenteditable="true" id="txt-mod11">
+                [Haga clic aquí para redactar el alcance específico y entregables adicionales para este cliente]
+            </div>
+            <div class="slider-section">
+                <span class="duration-label">Plazo estimado para este módulo:</span>
+                <div class="slider-container">
+                    <input type="range" min="0" max="52" value="2" id="range-mod11" oninput="syncSliderValue(11)" onchange="registerState()">
+                </div>
+                <span class="duration-value" id="val-mod11">2 semanas</span>
+            </div>
+        </div>
+
+        <div class="module-card" id="mod12">
+            <div class="module-header">
+                <input type="checkbox" class="module-checkbox" id="chk-mod12" onchange="registerState(); updateTotalWeeks();">
+                <label for="chk-mod12" class="module-title" id="lbl-mod12">MÓDULO 12 · GESTIÓN DE LA PRODUCCIÓN O SERVICIOS (TRANSFORMACIÓN)</label>
+            </div>
+            <table>
+                <tr>
+                    <th>CAPA CONCEPTUAL — Alta Dirección</th>
+                    <th>CAPA OPERATIVA — Detalle Medio</th>
+                </tr>
+                <tr>
+                    <td><div class="editable-box" contenteditable="true">Optimización del proceso central de creación de valor, ya sea en manufactura física o en la prestación de servicios.</div></td>
+                    <td><div class="editable-box" contenteditable="true">Control estadístico de mermas o reprocesos, y estandarización del tiempo de ciclo (lead time) en los puntos de contacto con el cliente.</div></td>
+                </tr>
+            </table>
+            <div class="client-inputs editable-box" contenteditable="true" id="txt-mod12">
+                [Haga clic aquí para redactar el alcance específico y entregables adicionales para este cliente]
+            </div>
+            <div class="slider-section">
+                <span class="duration-label">Plazo estimado para este módulo:</span>
+                <div class="slider-container">
+                    <input type="range" min="0" max="52" value="4" id="range-mod12" oninput="syncSliderValue(12)" onchange="registerState()">
+                </div>
+                <span class="duration-value" id="val-mod12">4 semanas</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-break">
+        <div class="editable-box" contenteditable="true">
+            <h3>4. Plan de Trabajo Modular</h3>
+            <p>La duración del proyecto escala dinámicamente con la cantidad y complejidad de los módulos contratados. La estructura se rige bajo cuatro fases esenciales:</p>
+            <ul>
+                <li><strong>Fase 1 · Diagnóstico de situación actual:</strong> Informe ejecutivo con cuantificación de ineficiencias y riesgos, restringido a los módulos contratados. Mapa de restricciones críticas y evaluación del flujo real.</li>
+                <li><strong>Fase 2 · Propuesta de rediseño:</strong> Nuevo diseño de los procesos comprendidos en los módulos seleccionados. Estrategia adaptada a la infraestructura y tecnología disponible.</li>
+                <li><strong>Fase 3 · Tablero de control operativo:</strong> Cuadro de mando integrado con los KPIs correspondientes (financieros y operativos). Configuración de rutinas de alertas.</li>
+                <li><strong>Fase 4 · Acompañamiento y sostenibilidad (Opcional):</strong> Traspaso completo del conocimiento metodológico al equipo interno para asegurar la continuidad del modelo sin dependencia externa.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="section-break">
+        <div class="editable-box" contenteditable="true">
+            <h3>5. Por qué este enfoque</h3>
+            <p>Tres decisiones fundamentales distinguen a este modelo estructural de un diagnóstico tradicional, sosteniéndose con total independencia del volumen de módulos seleccionados:</p>
+            <ol>
+                <li><strong>Se decide con una capa y se ejecuta con la otra:</strong> Evita la pérdida de foco en la traducción técnica. La Alta Dirección visualiza el impacto financiero directo en el negocio, mientras que el equipo operativo cuenta con la definición milimétrica necesaria para actuar en el día a día.</li>
+                <li><strong>Garantía de autonomía:</strong> Ninguna mejora se declara concluida hasta que el equipo de la empresa es capaz de sostenerla de forma autónoma, sustentado por la fase explícita de traspaso de capacidad.</li>
+                <li><strong>Visión de sistema integral:</strong> La cadena de valor se aborda de punta a punta. Cada módulo contratado se diseña considerando su repercusión colateral en los eslabones adyacentes para erradicar mejoras locales que perjudiquen la rentabilidad global.</li>
+            </ol>
+        </div>
+    </section>
+
+    <section class="section-break">
+        <h3>6. Resumen de Compromisos y Ejes Contratados</h3>
+        <p>A continuación, se consolidan de manera automática los módulos validados por el cliente que formarán parte del acuerdo de servicios de consultoría:</p>
+        <div id="summary-container" class="summary-box">
+            <p style="font-style: italic; color: #6b7280;">No se ha seleccionado ningún módulo aún. Por favor, marque las opciones en la Sección 3.</p>
+        </div>
+    </section>
+
+    <section class="section-break" style="margin-bottom: 120px;">
+        <h3>7. Propuesta Económica e Inversión</h3>
+        <p>El esquema de honorarios profesionales se consolida a partir de la matriz de módulos validados, su complejidad inherente y el cronograma financiero acordado por las partes.</p>
+        <div class="editable-box" contenteditable="true" style="border: 1px dashed var(--secondary-color); padding: 15px; min-height: 150px; background-color: #fafbfc; border-radius: 6px;">
+            <p><strong>[Área libre para escribir la propuesta económica en forma simple]</strong></p>
+            <p>Por ejemplo:</p>
+            <ul>
+                <li><strong>Inversión Total por Módulos Seleccionados:</strong> USD [Valor] / $ [Valor]</li>
+                <li><strong>Forma de Pago:</strong> 50% de anticipo al inicio y 50% contra entrega de los informes finales de fase.</li>
+                <li><strong>Fase de acompañamiento (Opcional):</strong> Abono mensual sugerido de [Valor] durante el período de traspaso operativo.</li>
+            </ul>
+        </div>
+    </section>
+</div>
+
+<div class="footer-sticky-bar">
+    <div class="total-title">CRONOGRAMA TOTAL ESTIMADO (Ejes Seleccionados):</div>
+    <div class="total-value-box"><span id="total-weeks">0</span> Semanas</div>
+</div>
+
+<script>
+    // Sistema de Undo (Historial de estados)
+    let stateHistory = [];
+    const maxHistory = 20;
+
+    function captureState() {
+        let state = [];
+        for (let i = 1; i <= 12; i++) {
+            const checkbox = document.getElementById('chk-mod' + i);
+            const slider = document.getElementById('range-mod' + i);
+            state.push({
+                index: i,
+                checked: checkbox ? checkbox.checked : false,
+                weeks: slider ? slider.value : 0
+            });
+        }
+        return JSON.stringify(state);
+    }
+
+    function registerState() {
+        const currentState = captureState();
+        if (stateHistory.length === 0 || stateHistory[stateHistory.length - 1] !== currentState) {
+            stateHistory.push(currentState);
+            if (stateHistory.length > maxHistory) {
+                stateHistory.shift();
+            }
+        }
+        document.getElementById('btn-undo').disabled = stateHistory.length <= 1;
+    }
+
+    function undoLastAction() {
+        if (stateHistory.length > 1) {
+            stateHistory.pop(); // Eliminar estado actual
+            const previousState = JSON.parse(stateHistory[stateHistory.length - 1]);
+            
+            previousState.forEach(mod => {
+                const checkbox = document.getElementById('chk-mod' + mod.index);
+                const slider = document.getElementById('range-mod' + mod.index);
+                const display = document.getElementById('val-mod' + mod.index);
+                
+                if (checkbox) checkbox.checked = mod.checked;
+                if (slider) slider.value = mod.weeks;
+                if (display) display.innerText = mod.weeks + " semanas";
+            });
+            
+            updateTotalWeeks();
+            document.getElementById('btn-undo').disabled = stateHistory.length <= 1;
+        }
+    }
+
+    function saveChanges() {
+        localStorage.setItem('scm_proposal_state', captureState());
+        alert("Cambios guardados con éxito en la sesión local de trabajo.");
+    }
+
+    function downloadHTML() {
+        // Forzar a que los sliders actuales se graben como atributos HTML estáticos
+        const sliders = document.querySelectorAll('input[type="range"]');
+        sliders.forEach(slider => {
+            slider.setAttribute('value', slider.value);
+        });
+
+        // Forzar a que los checkboxes tildados se graben como atributos HTML estáticos
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(cb => {
+            if (cb.checked) {
+                cb.setAttribute('checked', 'checked');
+            } else {
+                cb.removeAttribute('checked');
+            }
+        });
+
+        // Capturar el HTML final con las modificaciones dinámicas ya impactadas
+        const htmlContent = document.documentElement.outerHTML;
+
+        // Crear el archivo dinámico (Blob) y gatillar descarga
+        const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        
+        a.href = url;
+        a.download = 'Propuesta_SCM_Personalizada.html'; 
+        
+        document.body.appendChild(a);
+        a.click();
+        
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    function syncSliderValue(modIndex) {
+        const slider = document.getElementById('range-mod' + modIndex);
+        const display = document.getElementById('val-mod' + modIndex);
+        display.innerText = slider.value + " semanas";
+        updateTotalWeeks();
+    }
+
+    function updateTotalWeeks() {
+        let total = 0;
+        let summaryHTML = "";
+        let hasSelection = false;
+
+        for (let i = 1; i <= 12; i++) {
+            const checkbox = document.getElementById('chk-mod' + i);
+            const slider = document.getElementById('range-mod' + i);
+            const label = document.getElementById('lbl-mod' + i);
+            const clientInput = document.getElementById('txt-mod' + i);
+
+            if (checkbox && checkbox.checked) {
+                total += parseInt(slider.value);
+                hasSelection = true;
+                
+                let cleanText = clientInput.innerText.trim();
+                if (cleanText.startsWith("[Haga clic aquí")) {
+                    cleanText = "Sin especificaciones adicionales añadidas todavía.";
+                }
+
+                summaryHTML += `
+                    <div class="summary-item">
+                        <div class="summary-item-title">${label.innerText} (${slider.value} Semanas)</div>
+                        <p style="margin-top: 5px; font-size: 10pt; color: #4b5563;"><strong>Síntesis del alcance:</strong> ${cleanText}</p>
+                    </div>
+                `;
+            }
+        }
+
+        document.getElementById('total-weeks').innerText = total;
+        
+        const container = document.getElementById('summary-container');
+        if (hasSelection) {
+            container.innerHTML = summaryHTML + `
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid var(--primary-color); font-weight: bold; color: var(--accent-color);">
+                    Plazo total consolidado para el proyecto: ${total} semanas.
+                </div>
+            `;
+        } else {
+            container.innerHTML = '<p style="font-style: italic; color: #6b7280;">No se ha seleccionado ningún módulo aún. Por favor, marque las opciones en la Sección 3.</p>';
+        }
+    }
+
+    window.onload = function() {
+        updateTotalWeeks();
+        registerState();
+        
+        for (let i = 1; i <= 12; i++) {
+            const clientInput = document.getElementById('txt-mod' + i);
+            if(clientInput) {
+                clientInput.addEventListener('blur', function() {
+                    updateTotalWeeks();
+                });
+            }
+        }
+    };
+</script>
+
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("sw.js").catch(() => {});
+        });
+      }
+    </script>
+</body>
+</html>
