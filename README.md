@@ -1,134 +1,59 @@
-# Propuesta Modular SCM — Sincronización real con Firebase
+# Propuesta Modular SCM — Fix de edición de texto y Undo
 
-## Ya está todo el código listo. Solo falta UN paso tuyo: crear el proyecto
-## de Firebase y pegar 6 datos en el archivo. 5 a 10 minutos, gratis.
+## Qué se rompió y por qué
 
-No inventé ninguna cuenta ni ninguna clave — eso solo lo podés crear vos
-(requiere aceptar los términos de Google con tu propia cuenta). Una vez
-que me pases —o pegues vos mismo— esos 6 datos, la sincronización en
-tiempo real entre celular y notebook queda funcionando de punta a punta.
+**Síntoma:** al escribir en un campo editable, el cursor "volvía para atrás"
+y el texto salía invertido.
 
----
+**Causa real:** la sincronización en tiempo real con Firestore recibía de
+vuelta tu propio cambio cada ~700ms y volvía a "pintar" el `innerHTML`
+completo de todos los campos editables — incluyendo el que tenías activo
+en ese momento, mientras seguías escribiendo ahí. Cada repintado reiniciaba
+el cursor a la posición 0, así que la próxima tecla se insertaba antes de
+lo ya escrito. Es un bug clásico de sincronización en tiempo real cuando no
+se protege el campo con foco activo.
 
-## Paso 1 — Crear el proyecto de Firebase
+**Además:** el botón "Volver Atrás (Undo)" solo guardaba el estado de los
+checkboxes y sliders de los módulos — nunca el texto. Por eso, aunque
+tildaras y destildaras módulos el undo "funcionaba", pero para el texto
+nunca había nada que deshacer.
 
-1. Entrá a **https://console.firebase.google.com** con tu cuenta de Google.
-2. "Agregar proyecto" → ponele un nombre, por ejemplo `propuesta-scm`.
-3. Podés desactivar Google Analytics en este proyecto (no hace falta).
-4. Esperá a que termine de crearse (unos 30 segundos).
+## Qué se corrigió
 
-## Paso 2 — Activar Firestore
+1. **`applyState()` ya no pisa el campo que tenés enfocado.** Antes de
+   sobrescribir un `contenteditable`, un checkbox o un slider, revisa si
+   ese elemento es el que tiene el foco (`document.activeElement`) — si lo
+   es, lo deja en paz. Esto resuelve el cursor invertido de raíz.
+2. **Se ignora el "eco" de Firestore.** Cuando escribís algo, Firestore te
+   devuelve dos avisos: uno inmediato (todavía no confirmado por el
+   servidor) y uno confirmado. Ahora se ignora el primero
+   (`hasPendingWrites`), porque el DOM ya tiene ese contenido — no hace
+   falta repintarlo, y repintarlo era justamente lo que generaba el
+   problema.
+3. **El Undo ahora cubre TODO: texto, checkboxes y sliders.** Se unificó
+   con el mismo sistema que ya se usaba para el borrador local. Cada vez
+   que escribís, tildás algo o movés un slider, un momento después (medio
+   segundo de pausa) queda guardado un "punto de retroceso". "Volver Atrás"
+   ahora restaura texto incluido, no solo módulos.
+4. **El botón Undo se habilita solo.** Empieza deshabilitado (no hay nada
+   que deshacer todavía) y se habilita automáticamente en cuanto hacés el
+   primer cambio real después de cargar la página.
 
-1. En el menú de la izquierda: **Compilación → Firestore Database**.
-2. "Crear base de datos".
-3. Elegí **"Iniciar en modo de producción"**.
-4. Elegí la ubicación del servidor (cualquiera de Sudamérica, ej.
-   `southamerica-east1`, va a andar bien).
+## Cómo probarlo
 
-## Paso 3 — Configurar las reglas de acceso de Firestore
+1. Escribí varias oraciones seguidas en cualquier campo editable — el
+   cursor ya no debería saltar ni invertir el texto.
+2. Hacé 2 o 3 cambios distintos (texto, un módulo, un slider).
+3. El botón "Volver Atrás (Undo)" debería estar habilitado — tocalo y
+   confirmá que vuelve al estado anterior, texto incluido.
+4. Si tenés dos pestañas abiertas con el mismo código de propuesta,
+   escribí en una: la otra se actualiza sola, y la que estás usando para
+   escribir no se ve afectada mientras estás tipeando en ella.
 
-Dentro de Firestore Database → pestaña **"Reglas"**, reemplazar todo el
-contenido por esto y publicar:
-
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /propuestas/{docId} {
-      allow read, write: if true;
-    }
-  }
-}
-```
-
-**Importante — leer esto:** esta regla es intencionalmente abierta, porque
-la app no tiene un sistema de login. Cualquiera que sepa (o adivine) el
-"código de propuesta" exacto que le pongas a un cliente va a poder leerlo
-y editarlo. Por eso:
-- Usá códigos largos y no obvios (ej. `grido-cba-8f2k91`, no `cliente1`).
-- No pongas ahí información ultra sensible (montos finales de contrato,
-  datos personales) — es una propuesta comercial editable, no una caja
-  fuerte.
-
-## Paso 4 — Registrar una app Web y copiar la configuración
-
-1. En la página principal del proyecto (ícono de engranaje → "Configuración
-   del proyecto"), bajar hasta "Tus apps".
-2. Tocar el ícono **</>** (Web).
-3. Ponerle un apodo (ej. "propuesta-web") y "Registrar app". **No hace
-   falta** activar Firebase Hosting.
-4. Firebase te muestra un bloque de código con un objeto `firebaseConfig`
-   parecido a esto:
-
-```js
-const firebaseConfig = {
-  apiKey: "AIzaSy...",
-  authDomain: "propuesta-scm.firebaseapp.com",
-  projectId: "propuesta-scm",
-  storageBucket: "propuesta-scm.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef123456"
-};
-```
-
-## Paso 5 — Pegar esos datos en `index.html`
-
-Abrí `index.html` con cualquier editor de texto (o directo en GitHub, con
-el lápiz de "editar archivo") y buscá este bloque, cerca del final:
-
-```js
-const firebaseConfig = {
-    apiKey: "PEGAR_AQUI",
-    authDomain: "PEGAR_AQUI",
-    projectId: "PEGAR_AQUI",
-    storageBucket: "PEGAR_AQUI",
-    messagingSenderId: "PEGAR_AQUI",
-    appId: "PEGAR_AQUI"
-};
-```
-
-Reemplazá cada `"PEGAR_AQUI"` por el valor real que te dio Firebase en el
-Paso 4. Guardar, subir a GitHub pisando el `index.html` anterior.
-
-Si preferís, pegame acá los 6 valores y yo te devuelvo el archivo ya
-completado — como quieras.
-
----
-
-## Cómo se usa, una vez configurado
-
-- Arriba de los botones hay un campo **"Código de esta propuesta"**.
-  Ese código es la clave: si abrís el sitio en el celular y en la
-  notebook con el **mismo código**, van a ver y editar exactamente el
-  mismo contenido, en tiempo real (con conexión a internet).
-- El indicador de estado te dice en qué modo está:
-  - 🟢 Sincronizado en la nube — cambios visibles en todos los dispositivos
-    que usen el mismo código.
-  - 🟡 Nube no configurada — solo se guarda en este dispositivo (pasa esto
-    hasta que completes los Pasos 1 a 5).
-  - 🔴 Error de conexión — revisar las reglas de Firestore (Paso 3) o la
-    conexión a internet.
-- Si estás sin señal, la app sigue funcionando y guardando localmente;
-  apenas vuelva la conexión, sincroniza sola.
-- El botón **"Descargar Archivo Personalizado"** sigue estando disponible
-  para cuando quieras un archivo `.html` final y cerrado para mandarle al
-  cliente por mail, sin depender de que abra ningún link en vivo.
-
----
-
-## Qué se corrigió en esta versión (resumen de cambios previos)
-
-1. **Responsive real**: el archivo original solo tenía estilos para
-   impresión. Se agregó una media query para celular que apila las tablas,
-   botones y sliders en una sola columna.
-2. **PWA**: manifest + ícono + service worker, para poder "instalar" el
-   sitio en el celular como si fuera una app.
-3. **Service worker corregido**: ahora prioriza siempre la versión más
-   nueva del sitio (network-first) en vez de quedarse con una copia vieja
-   en caché.
-4. **No se perdió contenido**: se verificó línea por línea contra tu
-   archivo original — nada de tu texto fue borrado o modificado, solo se
-   agregaron estas capas nuevas.
+No se perdió ningún contenido del archivo original — se verificó línea por
+línea contra tu archivo subido; todos los cambios caen exclusivamente
+dentro del bloque `<script>` de lógica, nada del texto de las secciones 0
+a 7 fue tocado.
 
 ---
 
@@ -137,5 +62,6 @@ completado — como quieras.
 Repo: https://github.com/gustavonardone1965-cmyk/Consultnet/
 Sitio: https://gustavonardone1965-cmyk.github.io/Consultnet/
 
-Subir los 5 archivos (`index.html`, `manifest.json`, `sw.js`,
-`icon-192.png`, `icon-512.png`) pisando los existentes.
+Subir `index.html` pisando el existente. `manifest.json`, `sw.js` e íconos
+no cambiaron en esta corrección — no hace falta volver a subirlos si ya
+están en el repo.
